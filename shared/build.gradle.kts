@@ -30,7 +30,10 @@ kotlin {
     }
 
     sourceSets {
-
+        androidMain.dependencies {
+            implementation(libs.androidx.navigation.compose)
+            implementation(libs.koin.android)
+        }
         commonMain.dependencies {
             //put your multiplatform dependencies here
 
@@ -38,6 +41,12 @@ kotlin {
             implementation(compose.foundation)
             implementation(compose.material)
             implementation(compose.ui)
+            implementation(libs.koin.core)
+            //implementation(libs.koin.viewmodel)
+            implementation(libs.ktor.client.core)
+            implementation(libs.androidx.lifecycle.viewmodel)
+            implementation(libs.androidx.lifecycle.runtime.compose)
+            implementation(libs.kotlinx.serialization.core)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

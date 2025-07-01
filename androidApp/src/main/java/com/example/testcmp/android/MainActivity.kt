@@ -8,7 +8,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.testcmp.Feature.first.Compose.FirstScreen
+import com.example.testcmp.Feature.first.FirstViewModel
+import com.example.testcmp.Feature.second.compose.SecondScreen
 import com.example.testcmp.Greeting
+import org.koin.androidx.compose.koinViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -16,10 +20,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             MyApplicationTheme {
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    modifier = Modifier.fillMaxSize()
                 ) {
-                    GreetingView(Greeting().greet())
+                    SecondScreen(viewModel = koinViewModel())
                 }
             }
         }
