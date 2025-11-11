@@ -1,4 +1,4 @@
-package com.example.testcmp.Feature.second.step4.compose
+package com.example.testcmp.Feature.second.step2.compose
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
@@ -9,34 +9,30 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.testcmp.Base.ui.BaseScreen
-import com.example.testcmp.Feature.second.step4.Step4Event
-import com.example.testcmp.Feature.second.step4.Step4State
-import com.example.testcmp.Feature.second.step4.Step4ViewModel
+import com.example.testcmp.Feature.second.step2.Step2Event
+import com.example.testcmp.Feature.second.step2.Step2State
+import com.example.testcmp.Feature.second.step2.Step2ViewModel
 
 @Composable
-fun Step4Screen(
-    viewModel: Step4ViewModel,
-    onBackClick: () -> Unit,
-    onFinishClick: () -> Unit
+fun Step2Screen(
+    viewModel: Step2ViewModel
 ) {
     val state by viewModel.flowState.collectAsState()
     val lceState by viewModel.lceState.collectAsState()
 
     BaseScreen(lceState = lceState,
         onDefaultUiEvent = viewModel::onDefaultUiEvent) {
-        Step4ScreenView(
+        Step2ScreenView(
             state = state,
-            onBackClick = onBackClick,
-            onFinishClick = onFinishClick
+            viewModel = viewModel
         )
     }
 }
 
 @Composable
-fun Step4ScreenView(
-    state: Step4State,
-    onBackClick: () -> Unit,
-    onFinishClick: () -> Unit
+fun Step2ScreenView(
+    state: Step2State,
+    viewModel: Step2ViewModel
 ) {
     Column(
         modifier = Modifier
@@ -46,7 +42,7 @@ fun Step4ScreenView(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Step 4 (Final)",
+            text = "Step 2",
             fontSize = 24.sp,
             modifier = Modifier.padding(bottom = 32.dp)
         )
@@ -56,17 +52,17 @@ fun Step4ScreenView(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Button(
-                onClick = onBackClick,
+                onClick = { viewModel.pushEvent(Step2Event.BackClick) },
                 modifier = Modifier.weight(1f).padding(end = 8.dp)
             ) {
                 Text("Back")
             }
 
             Button(
-                onClick = onFinishClick,
+                onClick = { viewModel.pushEvent(Step2Event.ContinueClick) },
                 modifier = Modifier.weight(1f).padding(start = 8.dp)
             ) {
-                Text("Finish")
+                Text("Continue")
             }
         }
     }

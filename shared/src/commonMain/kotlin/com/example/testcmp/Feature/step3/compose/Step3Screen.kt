@@ -1,4 +1,4 @@
-package com.example.testcmp.Feature.second.step1.compose
+package com.example.testcmp.Feature.second.step3.compose
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
@@ -9,34 +9,30 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.testcmp.Base.ui.BaseScreen
-import com.example.testcmp.Feature.second.step1.Step1Event
-import com.example.testcmp.Feature.second.step1.Step1State
-import com.example.testcmp.Feature.second.step1.Step1ViewModel
+import com.example.testcmp.Feature.second.step3.Step3Event
+import com.example.testcmp.Feature.second.step3.Step3State
+import com.example.testcmp.Feature.second.step3.Step3ViewModel
 
 @Composable
-fun Step1Screen(
-    viewModel: Step1ViewModel,
-    onBackClick: () -> Unit,
-    onContinueClick: () -> Unit
+fun Step3Screen(
+    viewModel: Step3ViewModel
 ) {
     val state by viewModel.flowState.collectAsState()
     val lceState by viewModel.lceState.collectAsState()
 
     BaseScreen(lceState = lceState,
         onDefaultUiEvent = viewModel::onDefaultUiEvent) {
-        Step1ScreenView(
+        Step3ScreenView(
             state = state,
-            onBackClick = onBackClick,
-            onContinueClick = onContinueClick
+            viewModel = viewModel
         )
     }
 }
 
 @Composable
-fun Step1ScreenView(
-    state: Step1State,
-    onBackClick: () -> Unit,
-    onContinueClick: () -> Unit
+fun Step3ScreenView(
+    state: Step3State,
+    viewModel: Step3ViewModel
 ) {
     Column(
         modifier = Modifier
@@ -46,7 +42,7 @@ fun Step1ScreenView(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Step 1",
+            text = "Step 3",
             fontSize = 24.sp,
             modifier = Modifier.padding(bottom = 32.dp)
         )
@@ -55,11 +51,15 @@ fun Step1ScreenView(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            // No back button on step 1 as it's the first step
-            Spacer(modifier = Modifier.weight(1f).padding(end = 8.dp))
+            Button(
+                onClick = { viewModel.pushEvent(Step3Event.BackClick) },
+                modifier = Modifier.weight(1f).padding(end = 8.dp)
+            ) {
+                Text("Back")
+            }
 
             Button(
-                onClick = onContinueClick,
+                onClick = { viewModel.pushEvent(Step3Event.ContinueClick) },
                 modifier = Modifier.weight(1f).padding(start = 8.dp)
             ) {
                 Text("Continue")

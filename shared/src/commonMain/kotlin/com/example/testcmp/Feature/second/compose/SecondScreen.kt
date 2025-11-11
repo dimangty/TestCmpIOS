@@ -8,12 +8,14 @@ import com.example.testcmp.Feature.second.SecondEvent
 import com.example.testcmp.Feature.second.SecondState
 import com.example.testcmp.Feature.second.SecondViewModel
 import com.example.testcmp.Feature.second.StepType
+import com.example.testcmp.Feature.second.step1.Step1Event
 import com.example.testcmp.Feature.second.step1.Step1ViewModel
 import com.example.testcmp.Feature.second.step1.compose.Step1Screen
 import com.example.testcmp.Feature.second.step2.Step2ViewModel
 import com.example.testcmp.Feature.second.step2.compose.Step2Screen
 import com.example.testcmp.Feature.second.step3.Step3ViewModel
 import com.example.testcmp.Feature.second.step3.compose.Step3Screen
+import com.example.testcmp.Feature.second.step4.Step4Event
 import com.example.testcmp.Feature.second.step4.Step4ViewModel
 import com.example.testcmp.Feature.second.step4.compose.Step4Screen
 import com.example.testcmp.getKoinInstance
@@ -45,6 +47,24 @@ fun SecondScreenView(
     val step3ViewModel: Step3ViewModel = remember { getKoinInstance() }
     val step4ViewModel: Step4ViewModel = remember { getKoinInstance() }
 
+    LaunchedEffect(step1ViewModel) {
+        step1ViewModel.events.collect { event ->
+            when (event) {
+                Step1Event.BackClick -> onUiEvent(SecondEvent.NavigateBack)
+                Step1Event.ContinueClick -> Unit
+            }
+        }
+    }
+
+    LaunchedEffect(step4ViewModel) {
+        step4ViewModel.events.collect { event ->
+            when (event) {
+                Step4Event.BackClick -> Unit
+                Step4Event.FinishClick -> onUiEvent(SecondEvent.NavigateBack)
+            }
+        }
+    }
+
     Column(modifier = Modifier.fillMaxSize()) {
         StepIndicator(
             currentStep = currentStep,
@@ -54,46 +74,22 @@ fun SecondScreenView(
         when (currentStep) {
             StepType.STEP_1 -> {
                 Step1Screen(
-                    viewModel = step1ViewModel,
-                    onBackClick = {
-                        onUiEvent(SecondEvent.NavigateBack)
-                    },
-                    onContinueClick = {
-                        onUiEvent(SecondEvent.NextStep)
-                    }
+                    viewModel = step1ViewModel
                 )
             }
             StepType.STEP_2 -> {
                 Step2Screen(
-                    viewModel = step2ViewModel,
-                    onBackClick = {
-                        onUiEvent(SecondEvent.PreviousStep)
-                    },
-                    onContinueClick = {
-                        onUiEvent(SecondEvent.NextStep)
-                    }
+                    viewModel = step2ViewModel
                 )
             }
             StepType.STEP_3 -> {
                 Step3Screen(
-                    viewModel = step3ViewModel,
-                    onBackClick = {
-                        onUiEvent(SecondEvent.PreviousStep)
-                    },
-                    onContinueClick = {
-                        onUiEvent(SecondEvent.NextStep)
-                    }
+                    viewModel = step3ViewModel
                 )
             }
             StepType.STEP_4 -> {
                 Step4Screen(
-                    viewModel = step4ViewModel,
-                    onBackClick = {
-                        onUiEvent(SecondEvent.PreviousStep)
-                    },
-                    onFinishClick = {
-                        onUiEvent(SecondEvent.NavigateBack)
-                    }
+                    viewModel = step4ViewModel
                 )
             }
         }

@@ -1,8 +1,11 @@
 package com.example.testcmp.Feature.second.step2
 
 import com.example.testcmp.Base.BaseViewModel
+import com.example.testcmp.Feature.second.StepService
 
-class Step2ViewModel: BaseViewModel<Step2State, Step2Event>() {
+class Step2ViewModel(
+    private val stepService: StepService
+) : BaseViewModel<Step2State, Step2Event>() {
 
     override fun initToolbar() {
 
@@ -16,12 +19,8 @@ class Step2ViewModel: BaseViewModel<Step2State, Step2Event>() {
 
     override fun onEvent(event: Step2Event) {
         when (event) {
-            is Step2Event.BackClick -> {
-                // Navigate to previous step will be handled by parent
-            }
-            is Step2Event.ContinueClick -> {
-                // Navigate to next step will be handled by parent
-            }
+            is Step2Event.BackClick -> stepService.previousStep()
+            is Step2Event.ContinueClick -> stepService.nextStep()
         }
     }
 }
