@@ -2,7 +2,9 @@ package com.example.testcmp.Feature.second.compose
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -38,6 +40,7 @@ fun SecondScreen(viewModel: SecondViewModel) {
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SecondScreenView(
     state: SecondState,
@@ -50,6 +53,14 @@ fun SecondScreenView(
     val step3ViewModel: Step3ViewModel = remember { getKoinInstance() }
     val step4ViewModel: Step4ViewModel = remember { getKoinInstance() }
     val navController = rememberNavController()
+
+    BackHandler {
+        if (currentStep == StepType.STEP_1) {
+            onUiEvent(SecondEvent.NavigateBack)
+        } else {
+            onUiEvent(SecondEvent.PreviousStep)
+        }
+    }
 
     LaunchedEffect(step1ViewModel) {
         step1ViewModel.events.collect { event ->
