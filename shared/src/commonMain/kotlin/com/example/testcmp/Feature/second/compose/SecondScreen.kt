@@ -3,6 +3,9 @@ package com.example.testcmp.Feature.second.compose
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.testcmp.Base.ui.BaseScreen
 import com.example.testcmp.Feature.second.SecondEvent
 import com.example.testcmp.Feature.second.SecondState
@@ -46,6 +49,7 @@ fun SecondScreenView(
     val step2ViewModel: Step2ViewModel = remember { getKoinInstance() }
     val step3ViewModel: Step3ViewModel = remember { getKoinInstance() }
     val step4ViewModel: Step4ViewModel = remember { getKoinInstance() }
+    val navController = rememberNavController()
 
     LaunchedEffect(step1ViewModel) {
         step1ViewModel.events.collect { event ->
@@ -71,27 +75,79 @@ fun SecondScreenView(
             modifier = Modifier.fillMaxWidth()
         )
 
-        when (currentStep) {
-            StepType.STEP_1 -> {
-                Step1Screen(
-                    viewModel = step1ViewModel
-                )
-            }
-            StepType.STEP_2 -> {
-                Step2Screen(
-                    viewModel = step2ViewModel
-                )
-            }
-            StepType.STEP_3 -> {
-                Step3Screen(
-                    viewModel = step3ViewModel
-                )
-            }
-            StepType.STEP_4 -> {
-                Step4Screen(
-                    viewModel = step4ViewModel
-                )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+        ) {
+            NavHost(
+                navController = navController,
+                startDestination = StepNavRoute.Step1.route,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                composable(StepNavRoute.Step1.route) {
+                    Step1Screen(viewModel = step1ViewModel)
+                }
+                composable(StepNavRoute.Step2.route) {
+                    Step2Screen(viewModel = step2ViewModel)
+                }
+                composable(StepNavRoute.Step3.route) {
+                    Step3Screen(viewModel = step3ViewModel)
+                }
+                composable(StepNavRoute.Step4.route) {
+                    Step4Screen(viewModel = step4ViewModel)
+                }
             }
         }
     }
+
+    LaunchedEffect(navController) {
+        navController.currentBackStackEntryFlow.collect { entry ->
+            entry.destination.route
+                .toStepType()
+                ?.let { onUiEvent(SecondEvent.SetStep(it)) }
+        }
+    }
+
+    LaunchedEffect(currentStep, navController) {
+        val targetRoute = currentStep.toRoute()
+        val currentRoute = navController.currentBackStackEntry?.destination?.route
+        if (currentRoute == targetRoute) return@LaunchedEffect
+
+        if (targetRoute == StepNavRoute.Step1.route) {
+            navController.popBackStack(
+                StepNavRoute.Step1.route,
+                inclusive = false
+            )
+        } else {
+            navController.navigate(targetRoute) {
+                popUpTo(StepNavRoute.Step1.route) {
+                    inclusive = false
+                }
+                launchSingleTop = true
+            }
+        }
+    }
+}
+
+private enum class StepNavRoute(val route: String) {
+    Step1("step1"),
+    Step2("step2"),
+    Step3("step3"),
+    Step4("step4");
+}
+
+private fun StepType.toRoute(): String = when (this) {
+    StepType.STEP_1 -> StepNavRoute.Step1.route
+    StepType.STEP_2 -> StepNavRoute.Step2.route
+    StepType.STEP_3 -> StepNavRoute.Step3.route
+    StepType.STEP_4 -> StepNavRoute.Step4.route
+}
+
+private fun String?.toStepType(): StepType? = when (this) {
+    StepNavRoute.Step1.route -> StepType.STEP_1
+    StepNavRoute.Step2.route -> StepType.STEP_2
+    StepNavRoute.Step3.route -> StepType.STEP_3
+    StepNavRoute.Step4.route -> StepType.STEP_4
+    else -> null
 }

@@ -31,7 +31,6 @@ kotlin {
 
     sourceSets {
         androidMain.dependencies {
-            implementation(libs.androidx.navigation.compose)
             implementation(libs.koin.android)
         }
         commonMain.dependencies {
@@ -45,6 +44,7 @@ kotlin {
             implementation(libs.ktor.client.core)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.kotlinx.serialization)
+            implementation(libs.androidx.navigation.compose)
         }
     }
 }
