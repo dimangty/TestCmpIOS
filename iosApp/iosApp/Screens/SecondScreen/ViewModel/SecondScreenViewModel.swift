@@ -15,11 +15,24 @@ final class SecondScreenViewModel: ObservableObject {
     
     required init() {
         mViewModel = inject()
+        observe()
     }
 
     // MARK: - SecondScreenViewOutput methods
     func didLoad() {
         
+    }
+    
+    func observe() {
+        mViewModel.navigationEffectFlow.watch { [weak self] effect in
+            print("iOS ViewModel: Received navigation effect: \(effect)")
+            DispatchQueue.main.async {
+                if effect is NavigationAction.NavigateBack {
+                    print("iOS ViewModel: Executing pop navigation")
+                    NavigationService.shared.pop()
+                }
+            }
+        }
     }
 
 }

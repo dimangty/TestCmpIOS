@@ -58,6 +58,10 @@ actual class NavigationService {
             navController?.run {
                 when (action) {
                     is NavigationAction.NavigateToSecond,
+                    is NavigationAction.NavigateToStep1,
+                    is NavigationAction.NavigateToStep2,
+                    is NavigationAction.NavigateToStep3,
+                    is NavigationAction.NavigateToStep4
                         -> {
                         navigate(action)
                     }

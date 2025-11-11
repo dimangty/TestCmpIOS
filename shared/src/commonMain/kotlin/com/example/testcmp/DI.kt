@@ -2,6 +2,11 @@ package com.example.testcmp
 
 import androidx.compose.runtime.Composable
 import com.example.testcmp.Common.mvvm.LceStateManager
+import com.example.testcmp.Feature.second.StepService
+import com.example.testcmp.Feature.second.step1.Step1ViewModel
+import com.example.testcmp.Feature.second.step2.Step2ViewModel
+import com.example.testcmp.Feature.second.step3.Step3ViewModel
+import com.example.testcmp.Feature.second.step4.Step4ViewModel
 import com.example.testcmp.Navigation.NavigationService
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -42,6 +47,11 @@ internal val commonModule = module {
 
 
     factoryOf(::LceStateManager)
+    singleOf(::StepService)
+    factoryOf(::Step1ViewModel)
+    factoryOf(::Step2ViewModel)
+    factoryOf(::Step3ViewModel)
+    factoryOf(::Step4ViewModel)
 }
 
 inline fun <reified T> getKoinInstance(qualifier: Qualifier? = null) : T {

@@ -5,5 +5,5 @@ plugins {
     alias(libs.plugins.kotlinAndroid).apply(false)
     alias(libs.plugins.kotlinMultiplatform).apply(false)
     alias(libs.plugins.compose.compiler).apply(false)
-    alias(libs.plugins.compose).version("1.8.1").apply(false)
+    alias(libs.plugins.compose).version("1.9.2").apply(false)
 }
