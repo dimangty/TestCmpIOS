@@ -12,15 +12,16 @@ import com.example.testcmp.Feature.first.Compose.FirstScreen
 import com.example.testcmp.Feature.first.FirstViewModel
 import com.example.testcmp.Feature.second.compose.SecondScreen
 import com.example.testcmp.Greeting
-import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MyApplicationTheme {
+            MaterialTheme {
                 Surface(
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
                 ) {
                     SecondScreen(viewModel = koinViewModel())
                 }
@@ -37,7 +38,7 @@ fun GreetingView(text: String) {
 @Preview
 @Composable
 fun DefaultPreview() {
-    MyApplicationTheme {
+    MaterialTheme {
         GreetingView("Hello, Android!")
     }
 }

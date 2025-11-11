@@ -3,8 +3,8 @@ package com.example.testcmp.Base.ui
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,8 +32,7 @@ fun LoadingDialog() {
             CircularProgressIndicator(
                 modifier = Modifier.size(64.dp),
                 strokeWidth = 6.dp,
-                color = Color.Red,
-                backgroundColor = Color.Gray.copy(alpha = 0.2f),
+                color = MaterialTheme.colorScheme.primary,
             )
         }
     }

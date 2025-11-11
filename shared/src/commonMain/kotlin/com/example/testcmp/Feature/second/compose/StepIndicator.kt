@@ -3,8 +3,8 @@ package com.example.testcmp.Feature.second.compose
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,8 +50,8 @@ private fun StepIndicatorItem(
     isCompletedStep: Boolean
 ) {
     val backgroundColor = when {
-        isCurrentStep -> MaterialTheme.colors.primary
-        isCompletedStep -> MaterialTheme.colors.primary
+        isCurrentStep -> MaterialTheme.colorScheme.primary
+        isCompletedStep -> MaterialTheme.colorScheme.primary
         else -> Color.Gray
     }
 
@@ -85,7 +85,7 @@ private fun StepConnector(
             .width(40.dp)
             .height(2.dp)
             .background(
-                if (isCompleted) MaterialTheme.colors.primary else Color.Gray
+                if (isCompleted) MaterialTheme.colorScheme.primary else Color.Gray
             )
     )
 }

@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
     kotlin("plugin.compose")
-    alias(libs.plugins.compose)
+    alias(libs.plugins.compose.mp)
 }
 
 kotlin {
@@ -39,26 +39,21 @@ kotlin {
 
             implementation(compose.runtime)
             implementation(compose.foundation)
-            implementation(compose.material)
+            implementation(compose.material3)
             implementation(compose.ui)
             implementation(libs.koin.core)
-            //implementation(libs.koin.viewmodel)
             implementation(libs.ktor.client.core)
             implementation(libs.androidx.lifecycle.viewmodel)
-            implementation(libs.androidx.lifecycle.runtime.compose)
-            implementation(libs.kotlinx.serialization.core)
-        }
-        commonTest.dependencies {
-            implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.serialization)
         }
     }
 }
 
 android {
     namespace = "com.example.testcmp"
-    compileSdk = 35
+    compileSdk = libs.versions.compileAndroidSdk.get().toInt()
     defaultConfig {
-        minSdk = 28
+        minSdk = libs.versions.minAndroidSdk.get().toInt()
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8

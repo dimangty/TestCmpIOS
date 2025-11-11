@@ -8,11 +8,11 @@ plugins {
 
 android {
     namespace = "com.example.testcmp.android"
-    compileSdk = 35
+    compileSdk = libs.versions.compileAndroidSdk.get().toInt()
     defaultConfig {
         applicationId = "com.example.testcmp.android"
-        minSdk = 28
-        targetSdk = 35
+        minSdk = libs.versions.minAndroidSdk.get().toInt()
+        targetSdk = libs.versions.targetAndroidSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
     }
@@ -46,6 +46,7 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.koin.core)
     implementation(libs.koin.android)
-    implementation(libs.koin.android.compose)
+    implementation(libs.koin.compose)
+    implementation(libs.koin.compose.viewmodel)
     debugImplementation(libs.compose.ui.tooling)
 }
