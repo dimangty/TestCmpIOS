@@ -5,9 +5,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.backhandler.BackHandler
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import com.example.testcmp.Base.ui.BaseScreen
 import com.example.testcmp.Feature.second.SecondEvent
 import com.example.testcmp.Feature.second.SecondState
@@ -23,6 +28,7 @@ import com.example.testcmp.Feature.second.step3.compose.Step3Screen
 import com.example.testcmp.Feature.second.step4.Step4Event
 import com.example.testcmp.Feature.second.step4.Step4ViewModel
 import com.example.testcmp.Feature.second.step4.compose.Step4Screen
+import com.example.testcmp.Navigation.NavigationAction
 import com.example.testcmp.getKoinInstance
 
 @Composable
@@ -45,98 +51,106 @@ fun SecondScreen(viewModel: SecondViewModel) {
 fun SecondScreenView(
     state: SecondState,
     currentStep: StepType,
+    navController: NavHostController = rememberNavController(),
     onUiEvent: (SecondEvent) -> Unit
 ) {
-    // Create ViewModels for each step using getKoinInstance
-    val step1ViewModel: Step1ViewModel = remember { getKoinInstance() }
-    val step2ViewModel: Step2ViewModel = remember { getKoinInstance() }
-    val step3ViewModel: Step3ViewModel = remember { getKoinInstance() }
-    val step4ViewModel: Step4ViewModel = remember { getKoinInstance() }
-    val navController = rememberNavController()
-
     BackHandler {
-        if (currentStep == StepType.STEP_1) {
-            onUiEvent(SecondEvent.NavigateBack)
-        } else {
+        if (currentStep != StepType.STEP_1) {
             onUiEvent(SecondEvent.PreviousStep)
+        } else {
+            onUiEvent(SecondEvent.NavigateBack)
         }
     }
 
-    LaunchedEffect(step1ViewModel) {
-        step1ViewModel.events.collect { event ->
-            when (event) {
-                Step1Event.BackClick -> onUiEvent(SecondEvent.NavigateBack)
-                Step1Event.ContinueClick -> Unit
+    LaunchedEffect(currentStep) {
+        val targetRoute = when (currentStep) {
+            StepType.STEP_1 -> NavigationAction.NavigateToStep1
+            StepType.STEP_2 -> NavigationAction.NavigateToStep2
+            StepType.STEP_3 -> NavigationAction.NavigateToStep3
+            StepType.STEP_4 -> NavigationAction.NavigateToStep4
+        }
+        navController.navigate(targetRoute) {
+            launchSingleTop = true
+        }
+    }
+
+    // Observe current navigation destination and sync step indicator
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+    LaunchedEffect(currentBackStackEntry) {
+        currentBackStackEntry?.destination?.route?.let { route ->
+            val stepFromRoute = when (route) {
+                NavigationAction.NavigateToStep1::class.qualifiedName -> StepType.STEP_1
+                NavigationAction.NavigateToStep2::class.qualifiedName -> StepType.STEP_2
+                NavigationAction.NavigateToStep3::class.qualifiedName -> StepType.STEP_3
+                NavigationAction.NavigateToStep4::class.qualifiedName -> StepType.STEP_4
+                else -> null
+            }
+            stepFromRoute?.let { step ->
+                if (step != currentStep) {
+                    onUiEvent(SecondEvent.SetStep(step))
+                }
             }
         }
     }
 
-    LaunchedEffect(step4ViewModel) {
-        step4ViewModel.events.collect { event ->
-            when (event) {
-                Step4Event.BackClick -> Unit
-                Step4Event.FinishClick -> onUiEvent(SecondEvent.NavigateBack)
-            }
-        }
-    }
-
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(
+        modifier = Modifier.fillMaxSize()
+    ) {
         StepIndicator(
             currentStep = currentStep,
             modifier = Modifier.fillMaxWidth()
         )
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-        ) {
-            NavHost(
-                navController = navController,
-                startDestination = StepNavRoute.Step1.route,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                composable(StepNavRoute.Step1.route) {
-                    Step1Screen(viewModel = step1ViewModel)
-                }
-                composable(StepNavRoute.Step2.route) {
-                    Step2Screen(viewModel = step2ViewModel)
-                }
-                composable(StepNavRoute.Step3.route) {
-                    Step3Screen(viewModel = step3ViewModel)
-                }
-                composable(StepNavRoute.Step4.route) {
-                    Step4Screen(viewModel = step4ViewModel)
-                }
-            }
-        }
+        SignUpNavigationGraph(navController)
     }
+}
 
-    LaunchedEffect(navController) {
-        navController.currentBackStackEntryFlow.collect { entry ->
-            entry.destination.route
-                .toStepType()
-                ?.let { onUiEvent(SecondEvent.SetStep(it)) }
-        }
+@Composable
+fun SignUpNavigationGraph(
+    navController: NavHostController,
+) {
+    NavHost(
+        navController = navController,
+        startDestination = NavigationAction.NavigateToStep1,
+        enterTransition = { slideInHorizontally { it } },
+        exitTransition = { slideOutHorizontally { -it } },
+        popEnterTransition = { slideInHorizontally { -it } },
+        popExitTransition = { slideOutHorizontally { it } },
+        modifier = Modifier
+            .fillMaxSize()
+//            .background(color = EpsColor)
+    ) {
+        initSignUpRoutes()
     }
+}
 
-    LaunchedEffect(currentStep, navController) {
-        val targetRoute = currentStep.toRoute()
-        val currentRoute = navController.currentBackStackEntry?.destination?.route
-        if (currentRoute == targetRoute) return@LaunchedEffect
+fun NavGraphBuilder.initSignUpRoutes() {
+    step1Route()
+    step2Route()
+    step3Route()
+    step4Route()
+}
 
-        val currentStepNumber = currentRoute?.toStepType()?.stepNumber ?: 1
-        val targetStepNumber = currentStep.stepNumber
+fun NavGraphBuilder.step1Route() {
+    composable<NavigationAction.NavigateToStep1> {
+        Step1Screen()
+    }
+}
 
-        if (targetStepNumber < currentStepNumber) {
-            // Going backwards - pop back to target
-            navController.popBackStack(targetRoute, inclusive = false)
-        } else {
-            // Going forwards - navigate normally
-            navController.navigate(targetRoute) {
-                launchSingleTop = true
-            }
-        }
+fun NavGraphBuilder.step2Route() {
+    composable<NavigationAction.NavigateToStep2> {
+        Step2Screen()
+    }
+}
+
+fun NavGraphBuilder.step3Route() {
+    composable<NavigationAction.NavigateToStep3> {
+        Step3Screen(viewModel = getKoinInstance())
+    }
+}
+
+fun NavGraphBuilder.step4Route() {
+    composable<NavigationAction.NavigateToStep4> {
+        Step4Screen(viewModel = getKoinInstance())
     }
 }
 
