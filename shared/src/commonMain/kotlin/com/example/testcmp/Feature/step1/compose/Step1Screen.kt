@@ -12,10 +12,21 @@ import com.example.testcmp.Base.ui.BaseScreen
 import com.example.testcmp.Feature.second.step1.Step1Event
 import com.example.testcmp.Feature.second.step1.Step1State
 import com.example.testcmp.Feature.second.step1.Step1ViewModel
+import com.example.testcmp.Navigation.NavigationAction
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.compose.composable
+import com.example.testcmp.getKoinInstance
+
+fun NavGraphBuilder.navRouteStep1() {
+    composable<NavigationAction.NavigateToStep1> {
+        Step1Screen()
+    }
+}
 
 @Composable
 fun Step1Screen(
-    viewModel: Step1ViewModel
+    viewModel: Step1ViewModel = getKoinInstance(),
+    goBack: (() -> Unit)? = null
 ) {
     val state by viewModel.flowState.collectAsState()
     val lceState by viewModel.lceState.collectAsState()
@@ -24,7 +35,8 @@ fun Step1Screen(
         onDefaultUiEvent = viewModel::onDefaultUiEvent) {
         Step1ScreenView(
             state = state,
-            viewModel = viewModel
+            viewModel = viewModel,
+            goBack = goBack
         )
     }
 }
@@ -32,7 +44,8 @@ fun Step1Screen(
 @Composable
 fun Step1ScreenView(
     state: Step1State,
-    viewModel: Step1ViewModel
+    viewModel: Step1ViewModel,
+    goBack: (() -> Unit)? = null
 ) {
     Column(
         modifier = Modifier
@@ -52,7 +65,9 @@ fun Step1ScreenView(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Button(
-                onClick = { viewModel.pushEvent(Step1Event.BackClick) },
+                onClick = {
+                    goBack?.invoke() ?: viewModel.pushEvent(Step1Event.BackClick)
+                },
                 modifier = Modifier.weight(1f).padding(end = 8.dp)
             ) {
                 Text("Back")

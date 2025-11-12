@@ -12,10 +12,20 @@ import com.example.testcmp.Base.ui.BaseScreen
 import com.example.testcmp.Feature.second.step2.Step2Event
 import com.example.testcmp.Feature.second.step2.Step2State
 import com.example.testcmp.Feature.second.step2.Step2ViewModel
+import com.example.testcmp.Navigation.NavigationAction
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.compose.composable
+import com.example.testcmp.getKoinInstance
+
+fun NavGraphBuilder.navRouteStep2() {
+    composable<NavigationAction.NavigateToStep2> {
+        Step2Screen()
+    }
+}
 
 @Composable
 fun Step2Screen(
-    viewModel: Step2ViewModel
+    viewModel: Step2ViewModel = getKoinInstance()
 ) {
     val state by viewModel.flowState.collectAsState()
     val lceState by viewModel.lceState.collectAsState()

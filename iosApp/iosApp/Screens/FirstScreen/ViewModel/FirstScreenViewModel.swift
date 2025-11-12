@@ -12,7 +12,7 @@ import shared
 
 final class FirstScreenViewModel: ObservableObject {
     let mViewModel: shared.FirstViewModel
-    
+
     required init() {
         mViewModel = FirstViewModel()
         observe()

@@ -60,6 +60,7 @@ kizitonwose-calendar = { module = "com.kizitonwose.calendar:compose-multiplatfor
 androidx-security-crypto = { module = "androidx.security:security-crypto", version.ref = "encryptedsharedprefs" }
 android-recaptcha = { module = "com.google.android.recaptcha:recaptcha", version.ref = "recaptcha" }
 androidx-lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel", version.ref = "lifecycle" }
+androidx-lifecycle-viewmodel-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 androidx-navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigation-compose" }
 androidx-biometric = { module = "androidx.biometric:biometric", version.ref = "biometric" }
 androidx-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "splash-screen" }

@@ -14,7 +14,7 @@ final class SecondScreenViewModel: ObservableObject {
     let mViewModel: shared.SecondViewModel
     
     required init() {
-        mViewModel = inject()
+        mViewModel = SecondViewModel()
         observe()
     }
 
