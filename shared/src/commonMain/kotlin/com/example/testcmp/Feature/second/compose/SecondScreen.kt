@@ -125,16 +125,15 @@ fun SecondScreenView(
         val currentRoute = navController.currentBackStackEntry?.destination?.route
         if (currentRoute == targetRoute) return@LaunchedEffect
 
-        if (targetRoute == StepNavRoute.Step1.route) {
-            navController.popBackStack(
-                StepNavRoute.Step1.route,
-                inclusive = false
-            )
+        val currentStepNumber = currentRoute?.toStepType()?.stepNumber ?: 1
+        val targetStepNumber = currentStep.stepNumber
+
+        if (targetStepNumber < currentStepNumber) {
+            // Going backwards - pop back to target
+            navController.popBackStack(targetRoute, inclusive = false)
         } else {
+            // Going forwards - navigate normally
             navController.navigate(targetRoute) {
-                popUpTo(StepNavRoute.Step1.route) {
-                    inclusive = false
-                }
                 launchSingleTop = true
             }
         }
