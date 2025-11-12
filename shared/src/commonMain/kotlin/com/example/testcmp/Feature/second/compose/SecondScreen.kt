@@ -154,24 +154,4 @@ fun NavGraphBuilder.step4Route() {
     }
 }
 
-private enum class StepNavRoute(val route: String) {
-    Step1("step1"),
-    Step2("step2"),
-    Step3("step3"),
-    Step4("step4");
-}
 
-private fun StepType.toRoute(): String = when (this) {
-    StepType.STEP_1 -> StepNavRoute.Step1.route
-    StepType.STEP_2 -> StepNavRoute.Step2.route
-    StepType.STEP_3 -> StepNavRoute.Step3.route
-    StepType.STEP_4 -> StepNavRoute.Step4.route
-}
-
-private fun String?.toStepType(): StepType? = when (this) {
-    StepNavRoute.Step1.route -> StepType.STEP_1
-    StepNavRoute.Step2.route -> StepType.STEP_2
-    StepNavRoute.Step3.route -> StepType.STEP_3
-    StepNavRoute.Step4.route -> StepType.STEP_4
-    else -> null
-}
