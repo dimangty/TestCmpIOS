@@ -1,10 +1,8 @@
 package com.example.testcmp.Feature.second
 
 import com.example.testcmp.Base.BaseViewModel
-import org.koin.mp.KoinPlatform.getKoin
 
 class SecondViewModel: BaseViewModel<SecondState, SecondEvent>() {
-    private val stepService by getKoin().inject<StepService>()
     override fun initToolbar() {
 
     }
@@ -17,16 +15,15 @@ class SecondViewModel: BaseViewModel<SecondState, SecondEvent>() {
 
     override fun onEvent(event: SecondEvent) {
         when (event) {
-            is SecondEvent.ClickEvent -> {}
-            is SecondEvent.NextStep -> stepService.nextStep()
-            is SecondEvent.PreviousStep -> stepService.previousStep()
-            is SecondEvent.NavigateBack -> navigateBack()
-            is SecondEvent.SetStep -> stepService.setStep(event.step)
+            is SecondEvent.ContactPicked -> {
+                updateState {
+                    copy(
+                        contactName = event.contact?.name,
+                        contactPhone = event.contact?.phone
+                    )
+                }
+            }
         }
     }
-
-    fun getCurrentStep() = stepService.currentStep
-    fun canGoNext() = stepService.canGoNext()
-    fun canGoBack() = stepService.canGoBack()
 
 }

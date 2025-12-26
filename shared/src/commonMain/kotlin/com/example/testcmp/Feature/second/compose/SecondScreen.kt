@@ -1,163 +1,62 @@
 package com.example.testcmp.Feature.second.compose
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.backhandler.BackHandler
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import androidx.compose.ui.unit.dp
 import com.example.testcmp.Base.ui.BaseScreen
+import com.example.testcmp.Feature.contacts.rememberContactPicker
 import com.example.testcmp.Feature.second.SecondEvent
 import com.example.testcmp.Feature.second.SecondState
 import com.example.testcmp.Feature.second.SecondViewModel
-import com.example.testcmp.Feature.second.StepType
-import com.example.testcmp.Feature.second.step1.Step1Event
-import com.example.testcmp.Feature.second.step1.Step1ViewModel
-import com.example.testcmp.Feature.second.step1.compose.Step1Screen
-import com.example.testcmp.Feature.second.step2.Step2ViewModel
-import com.example.testcmp.Feature.second.step2.compose.Step2Screen
-import com.example.testcmp.Feature.second.step3.Step3ViewModel
-import com.example.testcmp.Feature.second.step3.compose.Step3Screen
-import com.example.testcmp.Feature.second.step4.Step4Event
-import com.example.testcmp.Feature.second.step4.Step4ViewModel
-import com.example.testcmp.Feature.second.step4.compose.Step4Screen
-import com.example.testcmp.getKoinInstance
 
 @Composable
 fun SecondScreen(viewModel: SecondViewModel) {
     val state by viewModel.flowState.collectAsState()
     val lceState by viewModel.lceState.collectAsState()
-    val currentStep by viewModel.getCurrentStep().collectAsState()
 
     BaseScreen(lceState = lceState,
         onDefaultUiEvent = viewModel::onDefaultUiEvent) {
         SecondScreenView(
             state = state,
-            currentStep = currentStep,
             onUiEvent = viewModel::pushEvent)
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun SecondScreenView(
-    state: SecondState,
-    currentStep: StepType,
-    onUiEvent: (SecondEvent) -> Unit
-) {
-    // Create ViewModels for each step using getKoinInstance
-    val step1ViewModel: Step1ViewModel = remember { getKoinInstance() }
-    val step2ViewModel: Step2ViewModel = remember { getKoinInstance() }
-    val step3ViewModel: Step3ViewModel = remember { getKoinInstance() }
-    val step4ViewModel: Step4ViewModel = remember { getKoinInstance() }
-    val navController = rememberNavController()
-
-    BackHandler {
-        if (currentStep == StepType.STEP_1) {
-            onUiEvent(SecondEvent.NavigateBack)
+fun SecondScreenView(state: SecondState,
+                    onUiEvent: (SecondEvent) -> Unit) {
+    val openContactPicker = rememberContactPicker { contact ->
+        onUiEvent(SecondEvent.ContactPicked(contact))
+    }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text("Hello from cmp")
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = { openContactPicker() }) {
+            Text("Open Contacts")
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        if (!state.contactName.isNullOrBlank() || !state.contactPhone.isNullOrBlank()) {
+            Text("Selected: ${state.contactName.orEmpty()}")
+            Text("Phone: ${state.contactPhone.orEmpty()}")
         } else {
-            onUiEvent(SecondEvent.PreviousStep)
+            Text("No contact selected")
         }
     }
-
-    LaunchedEffect(step1ViewModel) {
-        step1ViewModel.events.collect { event ->
-            when (event) {
-                Step1Event.BackClick -> onUiEvent(SecondEvent.NavigateBack)
-                Step1Event.ContinueClick -> Unit
-            }
-        }
-    }
-
-    LaunchedEffect(step4ViewModel) {
-        step4ViewModel.events.collect { event ->
-            when (event) {
-                Step4Event.BackClick -> Unit
-                Step4Event.FinishClick -> onUiEvent(SecondEvent.NavigateBack)
-            }
-        }
-    }
-
-    Column(modifier = Modifier.fillMaxSize()) {
-        StepIndicator(
-            currentStep = currentStep,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-        ) {
-            NavHost(
-                navController = navController,
-                startDestination = StepNavRoute.Step1.route,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                composable(StepNavRoute.Step1.route) {
-                    Step1Screen(viewModel = step1ViewModel)
-                }
-                composable(StepNavRoute.Step2.route) {
-                    Step2Screen(viewModel = step2ViewModel)
-                }
-                composable(StepNavRoute.Step3.route) {
-                    Step3Screen(viewModel = step3ViewModel)
-                }
-                composable(StepNavRoute.Step4.route) {
-                    Step4Screen(viewModel = step4ViewModel)
-                }
-            }
-        }
-    }
-
-    LaunchedEffect(navController) {
-        navController.currentBackStackEntryFlow.collect { entry ->
-            entry.destination.route
-                .toStepType()
-                ?.let { onUiEvent(SecondEvent.SetStep(it)) }
-        }
-    }
-
-    LaunchedEffect(currentStep, navController) {
-        val targetRoute = currentStep.toRoute()
-        val currentRoute = navController.currentBackStackEntry?.destination?.route
-        if (currentRoute == targetRoute) return@LaunchedEffect
-
-        val currentStepNumber = currentRoute?.toStepType()?.stepNumber ?: 1
-        val targetStepNumber = currentStep.stepNumber
-
-        if (targetStepNumber < currentStepNumber) {
-            // Going backwards - pop back to target
-            navController.popBackStack(targetRoute, inclusive = false)
-        } else {
-            // Going forwards - navigate normally
-            navController.navigate(targetRoute) {
-                launchSingleTop = true
-            }
-        }
-    }
-}
-
-private enum class StepNavRoute(val route: String) {
-    Step1("step1"),
-    Step2("step2"),
-    Step3("step3"),
-    Step4("step4");
-}
-
-private fun StepType.toRoute(): String = when (this) {
-    StepType.STEP_1 -> StepNavRoute.Step1.route
-    StepType.STEP_2 -> StepNavRoute.Step2.route
-    StepType.STEP_3 -> StepNavRoute.Step3.route
-    StepType.STEP_4 -> StepNavRoute.Step4.route
-}
-
-private fun String?.toStepType(): StepType? = when (this) {
-    StepNavRoute.Step1.route -> StepType.STEP_1
-    StepNavRoute.Step2.route -> StepType.STEP_2
-    StepNavRoute.Step3.route -> StepType.STEP_3
-    StepNavRoute.Step4.route -> StepType.STEP_4
-    else -> null
 }
